@@ -1,7 +1,5 @@
 class Node:
-    all_nodes = []
-
-    def __init__(self, terminal=False, rules=None):
+    def __init__(self, terminal=False, rules=None, color=None):
         self.terminal = terminal
         if rules is None:
             self.rules = []
@@ -9,8 +7,7 @@ class Node:
             self.rules = rules
 
         if not terminal:
-            self.color = len(Node.all_nodes)
-            Node.all_nodes += [self]
+            self.color = color
         else:
             self.color = -rules[1] - 5
 
@@ -24,3 +21,12 @@ class Node:
             res += [x]
             res += y
         return tuple(res)
+
+    def get_usefull_memory(self):
+        memory = 0
+        if self.terminal:
+            return 2
+        else:
+            for action, nodes in self.rules:
+                memory += 1 + len(nodes) * 8
+        return memory

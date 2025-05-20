@@ -14,10 +14,12 @@ class Grammar:
             self.terminals += [Node(terminal=True, rules=("1x1 pixel", i))]
         self.split_metric = split_metric
         self.root = None
+        self.nonterminals = []
 
     def add_images(self, images):
         if self.root is None:
-            self.root = Node()
+            self.root = Node(color=0)
+            self.nonterminals += [self.root]
 
         for img in tqdm(images):
             self.root.rules += [("single image", [self.build_grammar(img)])]
@@ -31,7 +33,11 @@ class Grammar:
         action, images = self.split_image(image)
         children = [self.build_grammar(img) for img in images]
 
-        return Node(terminal=False, rules=[(action, children)])
+        node = Node(
+            terminal=False, rules=[(action, children)], color=len(self.nonterminals)
+        )
+        self.nonterminals += [node]
+        return node
 
     def split_image(self, image):
         n, m = image.shape
@@ -110,3 +116,11 @@ class Grammar:
             else:
                 raise ValueError(f"Unknown action: {action}")
         return False
+
+    def get_usefull_memory(self):
+        memory = 0
+        for node in self.terminals:
+            memory += node.get_usefull_memory()
+        for node in self.nonterminals:
+            memory += node.get_usefull_memory()
+        return memory

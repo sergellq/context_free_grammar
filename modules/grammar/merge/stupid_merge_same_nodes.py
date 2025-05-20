@@ -1,16 +1,16 @@
 from tqdm.auto import tqdm
 
-from modules.grammar.node import Node
+from modules.grammar.grammar import Grammar
 
 
-def merge():
+def merge(grammar: Grammar):
     dct = {}
-    for i in tqdm(range(len(Node.all_nodes))):
-        hash = Node.all_nodes[i].hash_node()
+    for node in tqdm(grammar.nonterminals):
+        hash = node.hash_node()
         if hash in dct:
-            dct[hash] += [Node.all_nodes[i]]
+            dct[hash] += [node]
         else:
-            dct[hash] = [Node.all_nodes[i]]
+            dct[hash] = [node]
 
     new_color = {}
     new_nodes = []
@@ -30,15 +30,15 @@ def merge():
     # new colors
     for i in range(len(new_nodes)):
         new_nodes[i].color = i
-    Node.all_nodes = new_nodes
+    grammar.nonterminals = new_nodes
 
 
-def stupid_merge_same_nodes(grammar):
-    before = len(Node.all_nodes)
+def stupid_merge_same_nodes(grammar: Grammar):
+    before = len(grammar.nonterminals)
     while True:
-        n = len(Node.all_nodes)
-        merge()
+        n = len(grammar.nonterminals)
+        merge(grammar)
 
-        if n == len(Node.all_nodes):
+        if n == len(grammar.nonterminals):
             break
-    return before, len(Node.all_nodes)
+    return before, len(grammar.nonterminals)
