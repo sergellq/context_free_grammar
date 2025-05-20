@@ -38,5 +38,7 @@ def merge_nodes(a: Node, b: Node):
         return
 
     rules = a.rules + b.rules
+    unique = {repr(item): item for item in rules}
+    rules = list(unique.values())
     a.rules = rules
     b.rules = rules

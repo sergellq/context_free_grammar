@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm.auto import tqdm
 
 from modules.grammar.grammar import Grammar
 
@@ -18,10 +19,10 @@ class CountAccuracy:
         self.wrong_train = wrong_train
         self.wrong_valid = wrong_valid
 
-    def count_metrics(self):
+    def count_metrics(self, verbose: bool = False):
         res = {
-            "train": self._count_accuracy(self.train),
-            "valid": self._count_accuracy(self.valid),
+            "train": self._count_accuracy(self.train, verbose),
+            "valid": self._count_accuracy(self.valid, verbose),
         }
         res["wrong train"] = None
         res["wrong valid"] = None
@@ -35,7 +36,7 @@ class CountAccuracy:
                 )
             )
         else:
-            res["wrong train"] = self._count_accuracy(self.wrong_train)
+            res["wrong train"] = self._count_accuracy(self.wrong_train, verbose)
 
         if isinstance(self.wrong_valid, list):
             for i in range(len(self.wrong_valid)):
@@ -46,13 +47,13 @@ class CountAccuracy:
                 )
             )
         else:
-            res["wrong valid"] = self._count_accuracy(self.wrong_valid)
+            res["wrong valid"] = self._count_accuracy(self.wrong_valid, verbose)
 
         return res
 
-    def _count_accuracy(self, data):
+    def _count_accuracy(self, data, verbose: bool = False):
         accuracy = 0
-        for img in data:
+        for img in tqdm(data) if verbose else data:
             if self.grammar.is_image_in_grammar(img):
                 accuracy += 1
         return accuracy / len(data)

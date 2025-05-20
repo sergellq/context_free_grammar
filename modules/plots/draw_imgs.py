@@ -2,44 +2,54 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def draw_imgs(data, shape: tuple = None, random: bool = False) -> None:
+def draw_imgs(data, shape: tuple = None) -> None:
     """Displays a grid of image data using matplotlib.
 
+    Supports np.ndarray, list of np.ndarray, list of list of np.ndarray
+        (even with variable shapes).
+
     Args:
-        data (np.ndarray): Array of image data with shape (H, W) or (N, H, W)
-                           or (N, M, H, W)
-        shape (tuple): Tuple of (rows, columns) for the subplot grid. Defaults to (2, 7)
-        random (bool): Whether to randomly sample images from data. Defaults to False
+        data (np.ndarray | list): Image(s) data to display.
+        shape (tuple, optional): Grid shape (rows, cols). If None, inferred
+                                    automatically.
 
     Returns:
         None
     """
-    data = np.array(data)
-    if len(data.shape) == 2:
-        data = data[np.newaxis, :, :]
-        shape = (1, 1)
-    elif len(data.shape) == 4:
-        if shape is None:
-            shape = (data.shape[0], data.shape[1])
-        data = data.reshape((-1, data.shape[2], data.shape[3]))
-    elif len(data.shape) == 3 and shape is None:
-        shape = (1, data.shape[0])
-
-    rows, cols = shape
-    num_images = rows * cols
-    total = len(data)
-
-    plt.figure(figsize=(cols * 2, rows * 2))
-
-    if random:
-        indices = np.random.choice(total, num_images, replace=False)
+    # Normalize input to flat list of images
+    if isinstance(data, np.ndarray):
+        if data.ndim == 2:
+            data = [data]
+        elif data.ndim == 3:
+            data = list(data)
+        elif data.ndim == 4:
+            data = list(data.reshape(-1, data.shape[2], data.shape[3]))
+        else:
+            raise ValueError(f"Unsupported ndarray shape: {data.shape}")
+    elif isinstance(data, list):
+        # Flatten if list of lists
+        if isinstance(data[0], list):
+            data = [img for row in data for img in row]
     else:
-        indices = np.arange(num_images)
+        raise TypeError("Unsupported input type. Expected ndarray or list of ndarrays.")
 
-    for i, idx in enumerate(indices):
-        plt.subplot(rows, cols, i + 1)
-        plt.imshow(data[idx], cmap="gray" if data[idx].ndim == 2 else None)
-        plt.axis("off")
+    num_images = len(data)
+
+    # Infer shape if not given
+    if shape is None:
+        cols = min(7, num_images)
+        rows = int(np.ceil(num_images / cols))
+    else:
+        rows, cols = shape
+
+    plt.figure(figsize=(cols * 2, rows * 2), facecolor="lightgray")
+
+    for i in range(rows * cols):
+        ax = plt.subplot(rows, cols, i + 1)
+        if i < num_images:
+            ax.imshow(data[i], cmap="gray" if data[i].ndim == 2 else None)
+        ax.axis("off")
+        ax.set_facecolor("lightgray")
 
     plt.tight_layout()
     plt.show()

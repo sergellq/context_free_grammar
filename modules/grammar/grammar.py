@@ -42,18 +42,21 @@ class Grammar:
             res[node.height] += [node]
         for node in self.nonterminals:
             res[node.height] += [node]
-        if verbose:
-            print(
-                pd.DataFrame(
-                    {
-                        "height": np.arange(len(res)),
-                        "number of nodes": [len(x) for x in res],
-                    }
-                )
-                .set_index("height")
-                .T
+        df = (
+            pd.DataFrame(
+                {
+                    "height": np.arange(len(res)),
+                    "number of nodes": [len(x) for x in res],
+                }
             )
-        return res
+            .set_index("height")
+            .T
+        )
+        if verbose:
+            print(df)
+            return res
+        else:
+            return res, df
 
     def add_images(self, images):
         if self.root is None:
