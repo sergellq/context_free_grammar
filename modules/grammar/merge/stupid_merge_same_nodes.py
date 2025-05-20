@@ -3,9 +3,10 @@ from tqdm.auto import tqdm
 from modules.grammar.grammar import Grammar
 
 
-def merge(grammar: Grammar):
+def merge(grammar: Grammar, verbose: bool):
     dct = {}
-    for node in tqdm(grammar.nonterminals):
+    lst = tqdm(grammar.nonterminals) if verbose else grammar.nonterminals
+    for node in lst:
         hash = node.hash_node()
         if hash in dct:
             dct[hash] += [node]
@@ -33,12 +34,13 @@ def merge(grammar: Grammar):
     grammar.nonterminals = new_nodes
 
 
-def stupid_merge_same_nodes(grammar: Grammar):
+def stupid_merge_same_nodes(grammar: Grammar, verbose: bool = False):
     before = len(grammar.nonterminals)
     while True:
         n = len(grammar.nonterminals)
-        merge(grammar)
+        merge(grammar, verbose)
 
         if n == len(grammar.nonterminals):
             break
+
     return before, len(grammar.nonterminals)

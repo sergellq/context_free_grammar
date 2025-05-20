@@ -136,19 +136,21 @@ class Grammar:
 
         for action, nodes in node.rules:
             if action == "horizontal line":
-                image0 = image[: image.shape[0] // 2]
-                image1 = image[image.shape[0] // 2 :]
-                if self.is_image_in_grammar(
-                    image0, nodes[0]
-                ) and self.is_image_in_grammar(image1, nodes[1]):
-                    return True
+                if image.shape[0] > 1:
+                    image0 = image[: image.shape[0] // 2]
+                    image1 = image[image.shape[0] // 2 :]
+                    if self.is_image_in_grammar(
+                        image0, nodes[0]
+                    ) and self.is_image_in_grammar(image1, nodes[1]):
+                        return True
             elif action == "vertical line":
-                image0 = image[:, : image.shape[1] // 2]
-                image1 = image[:, image.shape[1] // 2 :]
-                if self.is_image_in_grammar(
-                    image0, nodes[0]
-                ) and self.is_image_in_grammar(image1, nodes[1]):
-                    return True
+                if image.shape[1] > 1:
+                    image0 = image[:, : image.shape[1] // 2]
+                    image1 = image[:, image.shape[1] // 2 :]
+                    if self.is_image_in_grammar(
+                        image0, nodes[0]
+                    ) and self.is_image_in_grammar(image1, nodes[1]):
+                        return True
             elif action == "single image":
                 if self.is_image_in_grammar(image, nodes[0]):
                     return True
