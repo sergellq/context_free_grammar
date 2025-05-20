@@ -37,19 +37,23 @@ class Grammar:
 
         dfs(self.root)
 
+        res = [[] for _ in range(self.root.height + 1)]
+        for node in self.terminals:
+            res[node.height] += [node]
+        for node in self.nonterminals:
+            res[node.height] += [node]
         if verbose:
-            res = np.zeros(self.root.height + 1)
-            for node in self.terminals:
-                res[node.height] += 1
-            for node in self.nonterminals:
-                res[node.height] += 1
-            return (
+            print(
                 pd.DataFrame(
-                    {"height": np.arange(len(res)), "number of nodes": res.astype(int)}
+                    {
+                        "height": np.arange(len(res)),
+                        "number of nodes": [len(x) for x in res],
+                    }
                 )
                 .set_index("height")
                 .T
             )
+        return res
 
     def add_images(self, images):
         if self.root is None:

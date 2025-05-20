@@ -30,3 +30,13 @@ class Node:
             for action, nodes in self.rules:
                 memory += 1 + len(nodes) * 8
         return memory
+
+
+def merge_nodes(a: Node, b: Node):
+    if a.terminal or b.terminal:
+        print("bad merge")
+        return
+
+    rules = a.rules + b.rules
+    a.rules = rules
+    b.rules = rules
