@@ -1,6 +1,7 @@
 import random
 
 import numpy as np
+import pandas as pd
 from tqdm.auto import tqdm
 
 from modules.grammar.node import Node
@@ -15,6 +16,40 @@ class Grammar:
         self.split_metric = split_metric
         self.root = None
         self.nonterminals = []
+
+    def set_height_for_all_nodes(self, verbose: bool = True):
+        for node in self.terminals:
+            node.height = 0
+        for node in self.nonterminals:
+            node.height = None
+
+        def dfs(node):
+            if node.height is not None:
+                return node.height
+            node.height = 0
+            for action, nodes in node.rules:
+                for nx in nodes:
+                    tmp = dfs(nx)
+                    if tmp > node.height:
+                        node.height = tmp
+            node.height += 1
+            return node.height
+
+        dfs(self.root)
+
+        if verbose:
+            res = np.zeros(self.root.height + 1)
+            for node in self.terminals:
+                res[node.height] += 1
+            for node in self.nonterminals:
+                res[node.height] += 1
+            return (
+                pd.DataFrame(
+                    {"height": np.arange(len(res)), "number of nodes": res.astype(int)}
+                )
+                .set_index("height")
+                .T
+            )
 
     def add_images(self, images):
         if self.root is None:
